@@ -1,16 +1,21 @@
 from functions.get_files_info import *
 
 def main():
-    print("ATTEMPTING TO WRITE")
-    print(write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum"))
+    print("TRYING TO RUN FILE")
+    print(run_python_file("calculator", "main.py"))
+
+    print("TRYING TO RUN FILE")
+    print(run_python_file("calculator", "main.py",["3 + 5"]))
+
+    print("TRYING TO RUN FILE")
+    print(run_python_file("calculator", "test.py"))
+
+    print("TRYING TO RUN FILE")
+    print(run_python_file("calculator", "../main.py"))
+
+    print("TRYING TO RUN FILE")
+    print(run_python_file("calculator", "nonexistent.py"))
     
-    print("ATTEMPTING TO WRITE")
-    print(write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"))
-
-    print("ATTEMPTING TO WRITE")
-    print(write_file("calculator", "/tmp/temp.txt", "this should not be allowed"))
-
-
 
 if __name__== "__main__":
     main()
