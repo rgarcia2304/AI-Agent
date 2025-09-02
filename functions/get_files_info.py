@@ -46,5 +46,18 @@ def get_file_content(working_directory, file_path):
 
     return f'\t {file_content_string}'
 
+def write_file(working_directory, file_path, content):
+    joined_path = os.path.join(working_directory, file_path)
+    absolute_path = os.path.abspath(joined_path)
+    working_dir_abs_path = os.path.abspath(working_directory)
 
-        
+    if (absolute_path.startswith(working_dir_abs_path)) == False:
+        return f'\tError: Cannot read "{file_path}" as it is outside the permitted working directory'
+    try:
+        with open(absolute_path, "w") as f:
+            f.write(content)
+
+    except Exception as e:
+        return f'f\tError: writing'
+
+    return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
