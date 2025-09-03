@@ -6,7 +6,7 @@ load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 from google.genai import types
-from functions.get_files_info import schema_get_files_info
+from functions.get_files_info import *
 
 system_prompt = """
 You are a helpful AI coding agent.
@@ -14,12 +14,55 @@ You are a helpful AI coding agent.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
 -List files and directories
+-Return contents of a specific file
+-Write to file or create a file
+-Run python files
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 
 
 """
 
+def call_function(function_call_part, verbose=False):
+        
+    kwargs = dict(function_call_part.args)
+    kwargs["working_directory"] = "./calculator"
+    
+    if kwargs.get("args") is None:
+        del kwargs["args"]
+
+    if (verbose):
+        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+    else:
+        print(f"Calling function: {function_call_part.name}")
+
+    function_mapping = {"get_files_info":get_files_info, "get_file_content":get_file_content, "write_file":write_file, "run_python_file":run_python_file}
+    func = function_mapping.get(function_call_part.name)
+    
+    if func is None:
+        return types.Content(
+    role="tool",
+    parts=[
+        types.Part.from_function_response(
+            name=function_name,
+            response={"error": f"Unknown function: {function_name}"},
+        )
+    ],
+)
+
+    else:
+        result = func(**kwargs)
+        return types.Content(
+    role="tool",
+    parts=[
+        types.Part.from_function_response(
+            name=function_call_part.name,
+            response={"result": result},
+        )
+    ],
+)
+ 
+    
 def main():
     
     if len(sys.argv) < 2:
@@ -27,11 +70,16 @@ def main():
         return 1
     else:
         
+        verbose_flag = False
+
         available_functions = types.Tool(
                 function_declarations=[
                         schema_get_files_info,
+                        schema_get_file_content,
+                        schema_write_file,
+                        schema_run_python_file,
                     ])
-
+        
         messages = [
                  types.Content(role="user", parts=[types.Part(text=sys.argv[1])]),
                  ]
@@ -40,18 +88,22 @@ def main():
                 model='gemini-2.0-flash-001', 
                 contents=messages,
                 config=types.GenerateContentConfig(
-                    tools=[available_functions], system_instruction=system_prompt),
-                )
+                    tools=[available_functions], system_instruction=system_prompt,
+                ))
+        print(len(sys.argv))
         if len(sys.argv) == 3:
             if sys.argv[2] == "--verbose":
+                verbose_flag = True
                 print(f"User prompt: {sys.argv[1]}")
                 print(f'Prompt Tokens: {response.usage_metadata.prompt_token_count}')
                 print(f'Response Tokens: {response.usage_metadata.candidates_token_count}')
-                
+        
 
-        if len(response.function_calls) > 0:
+        if response.function_calls is not None:
             for i in range(len(response.function_calls)):
-                print(f"Calling function: {response.function_calls[i].name}({response.function_calls[i].args})")
+                fc_result = call_function(response.function_calls[i], verbose_flag)
+                if (fc_result.parts[0].function_response.response is not None) and verbose_flag == True:
+                    print(f'-> {fc_result.parts[0].function_response.response}')
         else:
             print(response.text)    
         return 0

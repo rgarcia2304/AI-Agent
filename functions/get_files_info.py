@@ -98,6 +98,7 @@ def run_python_file(working_directory, file_path, args=[]):
     except Exception as e:
         return f'Error: executing Python file: {e}'
 
+
 schema_get_files_info = types.FunctionDeclaration(
     name="get_files_info",
     description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
@@ -111,3 +112,55 @@ schema_get_files_info = types.FunctionDeclaration(
         },
     ),
 )
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Read out the contents of the specified file, constrained to the working directory",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The filepath to try to extract contents from, relative to the working directory.",
+            ),
+        },
+    ),
+)
+
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="Write to the specified filepath location, constrained to the working directory",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The filepath specifiying the location for where to write to or to create a new file to write to , relative to the working directory.",
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="The content that will be written into the location at the specified filepath."),
+        },
+    ),
+)
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Execute a Python file in the working directory and return its output.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path to the Python file, relative to working directory.",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="Command-line args passed to the Python file.",
+                items=types.Schema(type=types.Type.STRING),  # each element must be a string
+            ),
+        },
+        required=["file_path"],
+    ),
+)
+
