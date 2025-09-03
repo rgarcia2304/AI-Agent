@@ -24,13 +24,12 @@ All paths you provide should be relative to the working directory. You do not ne
 """
 
 def call_function(function_call_part, verbose=False):
-        
+    
+    print(f"[DEBUG] raw args: {function_call_part.args}")
+
     kwargs = dict(function_call_part.args)
     kwargs["working_directory"] = "./calculator"
     
-    if kwargs.get("args") is None:
-        del kwargs["args"]
-
     if (verbose):
         print(f"Calling function: {function_call_part.name}({function_call_part.args})")
     else:

@@ -156,8 +156,8 @@ schema_run_python_file = types.FunctionDeclaration(
             ),
             "args": types.Schema(
                 type=types.Type.ARRAY,
-                description="Command-line args passed to the Python file.",
-                items=types.Schema(type=types.Type.STRING),  # each element must be a string
+                description="Command-line args passed to the Python file., IS NOT REQUIRED",
+                items=types.Schema(type=types.Type.STRING), 
             ),
         },
         required=["file_path"],
