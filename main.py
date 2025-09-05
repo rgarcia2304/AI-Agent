@@ -7,6 +7,7 @@ api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 from google.genai import types
 from functions.get_files_info import *
+import json
 
 system_prompt = """
 You are a helpful AI coding agent.
@@ -23,9 +24,10 @@ All paths you provide should be relative to the working directory. You do not ne
 
 """
 
+
 def call_function(function_call_part, verbose=False):
     
-    print(f"[DEBUG] raw args: {function_call_part.args}")
+    #print(f"[DEBUG] raw args: {function_call_part.args}")
 
     kwargs = dict(function_call_part.args)
     kwargs["working_directory"] = "./calculator"
@@ -83,28 +85,49 @@ def main():
                  types.Content(role="user", parts=[types.Part(text=sys.argv[1])]),
                  ]
 
-        response = client.models.generate_content(
-                model='gemini-2.0-flash-001', 
-                contents=messages,
-                config=types.GenerateContentConfig(
-                    tools=[available_functions], system_instruction=system_prompt,
-                ))
-        print(len(sys.argv))
-        if len(sys.argv) == 3:
-            if sys.argv[2] == "--verbose":
-                verbose_flag = True
-                print(f"User prompt: {sys.argv[1]}")
-                print(f'Prompt Tokens: {response.usage_metadata.prompt_token_count}')
-                print(f'Response Tokens: {response.usage_metadata.candidates_token_count}')
+        
+        for i in range(20):
+            
+            try:
+
+                response = client.models.generate_content(
+                    model='gemini-2.0-flash-001', 
+                    contents=messages,
+                    config=types.GenerateContentConfig(
+                        tools=[available_functions], system_instruction=system_prompt,
+                    ))
+               
+                 #add content to the conversation
+                for responses in response.candidates:
+                    #print(responses)
+                    messages.append(responses.content)
+
+                #print(len(sys.argv))
+                if len(sys.argv) == 3:
+                    if sys.argv[2] == "--verbose":
+                        verbose_flag = True
+                        print(f"User prompt: {sys.argv[1]}")
+                        print(f'Prompt Tokens: {response.usage_metadata.prompt_token_count}')
+                        print(f'Response Tokens: {response.usage_metadata.candidates_token_count}')
         
 
-        if response.function_calls is not None:
-            for i in range(len(response.function_calls)):
-                fc_result = call_function(response.function_calls[i], verbose_flag)
-                if (fc_result.parts[0].function_response.response is not None) and verbose_flag == True:
-                    print(f'-> {fc_result.parts[0].function_response.response}')
-        else:
-            print(response.text)    
+                if response.function_calls is not None:
+                    for i in range(len(response.function_calls)):
+                        fc_result = call_function(response.function_calls[i], verbose_flag)
+                        fc_response = fc_result.parts[0].function_response.response
+                        if (fc_response is not None) and verbose_flag == True:
+                            print(f'-> {fc_response}')
+                                
+                        messages.append(fc_result)
+                else:
+                     if response.text is not None:
+                        print(response.text)
+                        break
+
+            except Exception as e:
+                return f'Error: {e}'
+        
+        
         return 0
 
 if __name__ == "__main__":
