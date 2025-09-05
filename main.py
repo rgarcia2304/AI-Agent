@@ -21,6 +21,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 
+If asked to fix bugs take a look at the current implementation, by reading the contents of multiple files and directories to search for possible errors. If anything you spot could be the reason for the bug, fix it out. 
 
 """
 
