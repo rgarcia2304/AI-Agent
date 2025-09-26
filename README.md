@@ -1,6 +1,6 @@
 # AI Codebase Agent (Gemini Function-Calling)
 
-An autonomous coding agent that can **inspect, modify, and run code inside a target working directory**. It uses Google’s Gemini function-calling to plan actions (list files, read files, write files, run Python) and iterates until your request is done or the step budget is hit.
+An autonomous coding agent that can **inspect, modify, and run code inside a target working directory**. It uses Google’s Gemini function calling to plan actions (list files, read files, write files, run Python) and iterates until your request is done or the step budget is hit.
 
 ---
 
@@ -13,7 +13,7 @@ An autonomous coding agent that can **inspect, modify, and run code inside a tar
   - `write_file` — create/overwrite files
   - `run_python_file` — execute a Python file
 - **Guard-railed workspace**: all paths are **relative** to a designated working directory (defaults to `./calculator`).
-- **Iterative loop**: up to 20 function-calling steps with model feedback.
+- **Iterative loop**: up to 20 function calling steps with model feedback.
 - **Verbose mode**: see token usage and tool responses for debugging.
 
 ---
@@ -133,5 +133,6 @@ All file ops are forced into the working directory via server-side injection.
 The agent is instructed to only use relative paths.
 
 You should still sanitize path in each tool to prevent .. traversal.
+
 
 
