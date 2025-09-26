@@ -68,7 +68,7 @@ pip install -r requirements.txt
 
 Run:
 python agent.py "Add multiply(a, b) to calculator/ops.py and run calculator/main.py"
-
+```
 Verbose (debug) mode
 python agent.py "List project files" --verbose
 
@@ -132,3 +132,4 @@ All file ops are forced into the working directory via server-side injection.
 The agent is instructed to only use relative paths.
 
 You should still sanitize path in each tool to prevent .. traversal.
+
