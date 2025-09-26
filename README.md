@@ -69,12 +69,13 @@ pip install -r requirements.txt
 Run:
 python agent.py "Add multiply(a, b) to calculator/ops.py and run calculator/main.py"
 ```
+## Debugging
 Verbose (debug) mode
 python agent.py "List project files" --verbose
 
 Verbose prints your prompt, token usage, each tool call, and tool responses.
 
-Usage Examples
+## Usage Examples
 
 “Find the bug causing division by zero in calculator/ and fix it.”
 
@@ -82,7 +83,7 @@ Usage Examples
 
 “Read all files in calculator and summarize the module boundaries.”
 
-Configuration
+## Configuration
 
 API key: loaded from .env → GEMINI_API_KEY.
 
@@ -125,11 +126,12 @@ function_mapping = {
     "run_python_file": run_python_file,
 }
 
-Security Model
+## Security Model
 
 All file ops are forced into the working directory via server-side injection.
 
 The agent is instructed to only use relative paths.
 
 You should still sanitize path in each tool to prevent .. traversal.
+
 
